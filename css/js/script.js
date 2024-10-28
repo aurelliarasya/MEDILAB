@@ -1,5 +1,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
   import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
  
   // Your web app's Firebase configuration
   const firebaseConfig = {
@@ -15,8 +16,8 @@
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
-
   const db = getDatabase(app);
+  const auth = getAuth(app);
 
   document.getElementById("reg").addEventListener('click', function(e) {
     e.preventDefault(); // Mencegah reload halaman
@@ -25,6 +26,10 @@
     const password = document.getElementById("pass").value;
     const firstname = document.getElementById("fn").value;
     const lastname = document.getElementById("ln").value;
+
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
   
     // Simpan data pengguna ke Realtime Database
     set(ref(db, '/users/' + email.replace('.', '_')), {
@@ -41,6 +46,24 @@
       alert("Register Failed");
     });
   });
+});
+
+document.getElementById("login-btn").addEventListener('click', function(e) {
+  e.preventDefault();
+  
+  const email = document.getElementById("Username").value;
+  const password = document.getElementById("pass").value;
+
+  signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+          console.log("Login successful:", userCredential.user);
+          window.location.href = "home.html"; // Redirect ke halaman home setelah login berhasil
+      })
+      .catch((error) => {
+          console.error("Login failed:", error);
+          alert("Login failed: " + error.message);
+      });
+});
 
 // Mendapatkan elemen dari DOM
 const loginContainer = document.getElementById("login");

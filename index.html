@@ -102,6 +102,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
     
         // Konfigurasi Firebase
         const firebaseConfig = {
@@ -118,6 +120,7 @@
         // Inisialisasi Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
     
         // Ambil elemen-elemen dari DOM
         const loginContainer = document.getElementById("login");
@@ -169,6 +172,10 @@
             const password = document.getElementById("pass").value;
             const firstname = document.getElementById("fn").value;
             const lastname = document.getElementById("ln").value;
+
+            createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
           
             // Simpan data pengguna ke Realtime Database
             set(ref(db, 'users/' + email.replace('.', '_')), {
@@ -186,7 +193,27 @@
                 alert("Register Failed");
             });
         });
+    });
+
+    document.getElementById("login-btn").addEventListener("click", function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("Username").value;
+    const password = document.getElementById("pass").value;
+
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            // Login berhasil
+            alert("Login Succeed");
+            window.location.href = "home.html"; // Redirect ke halaman utama
+        })
+        .catch((error) => {
+            // Tampilkan pesan error jika login gagal
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(`Login Failed: ${errorMessage}`);
+        });
+});
     </script>
 </body>
 </html>
-
